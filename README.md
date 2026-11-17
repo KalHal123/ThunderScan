@@ -1,40 +1,40 @@
-Minecraft Java Server Scanner
+ThunderScan
 
-A lightweight Python-based Minecraft Java Edition server inventory tool. It checks configured Minecraft server endpoints and collects useful server information, including MOTD, player counts, version, protocol, player samples, and modded-server information.
+ThunderScan is a lightweight, multithreaded Minecraft Java Edition server inventory tool written in Python.
+
+It checks configured Minecraft server endpoints and collects server information, including the Message of the Day (MOTD), player counts, Minecraft version, protocol, player samples, and modded-server information.
 
 Features
-Minecraft Java Edition server status detection
-Concurrent server checks using ThreadPoolExecutor
-Configurable server targets
-Configurable request timeout
-Player count and player sample collection
-Minecraft version and protocol detection
-Modded server detection
-Secure chat information when available
-UTC timestamps
-Incremental JSON result saving
-Custom output file support
-Individual error handling
+Minecraft server detection: Retrieves Minecraft Java Edition server status information.
+Multithreading: Performs concurrent server checks using Python's ThreadPoolExecutor.
+Configurable targets: Loads server IP addresses and ports from a JSON configuration file.
+Configurable timeouts: Allows customization of Minecraft status request timeouts.
+Player information: Collects online player counts, maximum player capacity, and available player samples.
+Version detection: Retrieves Minecraft version names and protocol numbers.
+Modded server detection: Identifies available Forge server information.
+Secure chat information: Collects secure chat enforcement information when available.
+UTC timestamps: Records the time of each successful server response.
+Incremental saving: Saves successful results during execution.
+Custom output paths: Allows users to specify where results are stored.
+Error handling: Handles individual server failures without terminating the entire process.
 Requirements
-Python 3.10+
-Minecraft Java Edition endpoints
+Python 3.10 or newer
+Minecraft Java Edition server endpoints
 Permission to query the configured servers
+
+Python dependencies are listed in requirements.txt.
+
 Installation
-
-Clone the repository:
-
+1. Clone the repository
 bash
-git clone https://github.com/YOUR_USERNAME/minecraft-server-scanner.git
-cd minecraft-server-scanner
+git clone https://github.com/KalHal123/ThunderScan.git
+cd ThunderScan
 
-
-Create a virtual environment:
-
+2. Create a virtual environment
 bash
 python -m venv venv
 
-
-Activate it:
+3. Activate the virtual environment
 
 Linux / macOS
 
@@ -47,18 +47,23 @@ Windows
 powershell
 venv\Scripts\activate
 
-
-Install dependencies:
-
+4. Install dependencies
 bash
 pip install -r requirements.txt
 
 Configuration
 
-Edit servers.example.json or create your own servers.json.
+ThunderScan uses a JSON configuration file to define which Minecraft server endpoints should be checked.
 
-Example:
+Copy the example configuration:
 
+bash
+cp servers.example.json servers.json
+
+
+On Windows, you can also copy the file manually.
+
+Configuration example
 json
 {
     "servers": [
@@ -73,39 +78,64 @@ json
     ]
 }
 
+Configuration parameters
+Parameter	Description	Default
+ip	Server IP address or hostname	Required
+port	Minecraft server port	25565
 
-Only add endpoints you own or have explicit authorization to query.
+Only configure endpoints you own or have explicit authorization to query.
 
 Usage
+Basic execution
 
-Run with the default configuration:
+Run ThunderScan with the default configuration:
 
 bash
 python scanner.py
 
-
-Specify a custom configuration:
-
+Specify a configuration file
 bash
 python scanner.py --config servers.json
 
-
-Specify a custom output file:
-
+Specify an output file
 bash
 python scanner.py --output-file results/servers.json
 
+Configure worker threads
+bash
+python scanner.py --threads 10
 
-Configure concurrency and timeout:
+Configure request timeout
+bash
+python scanner.py --timeout 3
+
+Full command example
+bash
+python scanner.py \
+    --config servers.json \
+    --threads 10 \
+    --timeout 3 \
+    --output-file results/servers.json
+
+Command-line arguments
+Argument	Description	Default
+--config	Path to the JSON configuration file	servers.json
+--output-file	Custom JSON output path	Timestamped file in results/
+--threads	Maximum number of concurrent workers	10
+--timeout	Minecraft status request timeout in seconds	3
+
+Display all available arguments:
 
 bash
-python scanner.py --threads 10 --timeout 3
+python scanner.py --help
 
-Full example usage
-bash
-python scanner.py --config servers.json --threads 10 --timeout 3 --output-file results/servers.json
+Output
 
-Example Output
+ThunderScan saves successful server responses in JSON format.
+
+By default, output files are stored in the results/ directory with a timestamp in their filenames.
+
+Example output
 json
 [
     {
@@ -130,58 +160,85 @@ json
 ]
 
 
-The example values are illustrative.
+The example values are illustrative and do not represent a live server.
 
+Collected information
+Field	Description
+ip	Server IP address or hostname
+port	Server port
+timestamp	UTC timestamp of the response
+description	Server Message of the Day (MOTD)
+players.online	Current number of online players
+players.max	Maximum player capacity
+players.sample	Available sample player information
+version.name	Minecraft version name
+version.protocol	Minecraft protocol number
+is_modded	Whether Forge information is available
+secure_chat	Secure chat enforcement information, if available
 Project Structure
 text
-minecraft-server-scanner/
-├── scanner.py
-├── README.md
-├── requirements.txt
-├── servers.example.json
-├── .gitignore
-├── LICENSE
-└── results/
+ThunderScan/
+|
+|-- scanner.py
+|-- servers.example.json
+|-- requirements.txt
+|-- README.md
+|-- LICENSE
+|-- .gitignore
+|
+|-- results/
+    |-- servers.json
 
-Output
-
-Results are saved as JSON.
-
-Each successful server response contains:
-
-Field	Description
-ip	Server IP address
-port	Server port
-timestamp	UTC timestamp
-description	Server MOTD
-players.online	Current players
-players.max	Maximum players
-players.sample	Sample player information
-version.name	Minecraft server version
-version.protocol	Protocol version
-is_modded	Whether Forge data is available
-secure_chat	Secure chat information, if available
+File	Description
+scanner.py	Main scanner application
+servers.example.json	Example server configuration
+requirements.txt	Python dependencies
+README.md	Project documentation
+LICENSE	MIT license
+.gitignore	Git exclusion rules
+results/	Generated scan results
 Error Handling
 
-Servers that cannot be reached or do not respond correctly are skipped. Errors are reported in the terminal.
+ThunderScan handles individual server failures without terminating the entire execution.
+
+Possible errors include:
+
+Connection timeouts
+Connection refused
+Invalid Minecraft status responses
+DNS resolution failures
+Unreachable endpoints
+
+Errors are displayed in the terminal. Servers that fail to respond successfully are excluded from the results.
 
 Legal Notice
 
-This project is intended for authorized Minecraft server inventory and administration.
+ThunderScan is intended for authorized Minecraft server inventory and administration.
 
-Only query servers you own or have explicit permission to assess. You are responsible for complying with applicable laws, network policies, and service terms.
+Only query servers and infrastructure that you own or have explicit permission to assess.
+
+Users are responsible for complying with applicable laws, network policies, and service terms.
+
+The developers are not responsible for misuse of this software.
 
 License
 
-This project is licensed under the MIT License. See LICENSE for details.
+ThunderScan is distributed under the MIT License.
+
+See the LICENSE file for details.
 
 Contributing
 
 Contributions, bug reports, and feature requests are welcome.
 
+To contribute:
+
 Fork the repository.
 Create a feature branch.
+Make your changes.
 Commit your changes.
+Push your branch.
 Open a pull request.
+Dependencies
 
-Built with Python and mcstatus.
+ThunderScan uses mcstatus to communicate with Minecraft Java Edition servers.
